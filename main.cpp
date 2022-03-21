@@ -353,9 +353,8 @@ public:
     }
 
     int operator[](int index){
-        if(index <= this-> nrComenzi)
+        if(index < this-> nrComenzi)
             return this->idComenzi[index];
-        else return 0;
     }
 
     bool operator==(const Client& client){
@@ -446,6 +445,139 @@ public:
         this->produse = NULL;
     }
 
+    Comanda(Client client, int nrProduse, Produs* produse):idComanda(contorComenzi++){
+        this->client = client;
+        this->nrProduse = nrProduse;
+        this->produse = new Produs[this->nrProduse];
+        for(int i = 0; i < this->nrProduse; i++)
+            this->produse[i]=produse[i];
+    }
+
+    Comanda(Client client):idComanda(contorComenzi++){
+        this->client = client;
+    }
+
+    Comanda(const Comanda& cmd):idComanda(cmd.idComanda){
+        this->client = cmd.client;
+        this->nrProduse = cmd.nrProduse;
+        this->produse = new Produs[this->nrProduse];
+        for(int i = 0; i < this->nrProduse; i++)
+            this->produse[i] = cmd.produse[i];
+    }
+
+    ~Comanda(){
+        if(this->produse != NULL)
+            delete[] this->produse;
+    }
+
+    Comanda& operator=(const Comanda& cmd){
+        this->client = cmd.client;
+        this->nrProduse = cmd.nrProduse;
+        this->produse = new Produs[this->nrProduse];
+        for(int i = 0; i< this->nrProduse; i++)
+            this->produse[i] = cmd.produse[i];
+    }
+
+    void setClientComanda(Client client){
+        this->client = client;
+    }
+
+    void setProduseComanda(int nrProduse, Produs* produse){
+        this->nrProduse = nrProduse;
+        this->produse = new Produs[this->nrProduse];
+        for(int i = 0; i < this->nrProduse; i++)
+            this->produse[i] = produse[i];
+    }
+
+    Client getClientComanda(){
+        return this->client;
+    }
+
+    Produs* getProduseComanda(){
+        return this->produse;
+    }
+
+    Comanda operator+(Produs& produs){
+        Produs* aux = new Produs[nrProduse];
+        for(int i = 0; i < nrProduse ;i++)
+            aux[i]=this->produse[i];
+        delete[] this->produse;
+        this->nrProduse++;
+        produse = new Produs[nrProduse];
+        for(int i = 0; i < nrProduse-1 ;i++)
+            this->produse[i]=aux[i];
+        produse[nrProduse-1]=produs;
+    }
+
+    Produs operator[](int index){
+        if(index < this->nrProduse)
+            return this->produse[index];
+    }
+
+    bool operator==(const Comanda& cmd){
+        if(this->idComanda == cmd.idComanda)
+            return true;
+        else return false;
+    }
+
+    friend bool operator<(const Comanda& cmd1, const Comanda& cmd2){
+        return cmd1.nrProduse < cmd2.nrProduse;
+    }
+
+    friend istream& operator>>(istream&in, Comanda& cmd){
+        cin>>cmd.client;
+        cout<<"Numarul de produse din comanda este: ";
+        int alegere, continua = 1;
+        cmd.nrProduse = 0;
+        while(continua == 1){
+            cout<<"1.Adauga produs\n";
+            cout<<"2.Stop\n";
+            switch (alegere){
+                case 1:{
+                    Produs* aux = new Produs[cmd.nrProduse];
+                    for(int i = 0; i< cmd.nrProduse; i++)
+                        aux[i] = cmd.produse[i];
+                    delete[] cmd.produse;
+                    cmd.nrProduse++;
+                    cmd.produse = new Produs[cmd.nrProduse];
+                    Produs prod;
+                    cin>>prod;
+                    for(int i = 0; i < cmd.nrProduse-1; i++)
+                        cmd.produse[i]=aux[i];
+                    cmd.produse[cmd.nrProduse-1]=prod;
+                    break;
+                }
+                case 2:{
+                    alegere = 0;
+                    break;
+                }
+                default: {
+                    cout<<"Comanda incorecta\n";
+                    break;
+                }
+            }
+        }
+        return in;
+    }
+
+    friend ostream& operator<<(ostream& out, const Comanda& cmd){
+        out<<"Comanda este data de"<<endl<<cmd.client<<endl;
+        out<<"Comanda are "<<cmd.nrProduse<<" produse";
+        out<<"Acestea sunt: ";
+        for(int i = 0; i< cmd.nrProduse; i++)
+            out<<cmd.produse[i];
+        out<<endl;
+        out<<"Comanda are id-ul "<<cmd.idComanda<<endl;
+    }
+
+    void afisareProduseComanda(){
+        if(this->nrProduse){
+            cout<<"Comanda cu nr "<<this->idComanda<<" contine urmatoarele produse: \n";
+            for(int i = 0; i < this->nrProduse; i++)
+                cout<<this->produse[i];
+            cout<<endl;
+        }
+    }
 };
 int Comanda::contorComenzi=1000;
 
@@ -459,7 +591,7 @@ private:
 };
 
 void meniu(){
-    int alegere, continua =1;
+    int alegere, continua = 1;
     cout<<"Meniu"<<endl;
     cout<<"1.Adauga produs"<<endl;
     cout<<"2.Adauga comanda"<<endl;
