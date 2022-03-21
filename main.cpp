@@ -129,6 +129,12 @@ public:
         return aux;
     }
 
+    Produs operator*(float x){
+        Produs aux = *this;
+        aux.pret = aux.pret * x;
+        return aux;
+    }
+
     Produs operator+=(float x){
         this->pret += x;
         return *this;
