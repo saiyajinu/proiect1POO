@@ -38,7 +38,7 @@ public:
         this->pret = pret;
         this->disponibil = false;
         this->nrRatinguri = 0;
-        this->rating = NULL;
+        this->rating = new int[0];
         strcpy(this->culoare, "-");
     }
 
@@ -64,8 +64,8 @@ public:
     }
 
     ~Produs(){
-        if(this->culoare != NULL)
-            delete[] this->culoare;
+        if(this->rating != NULL)
+            delete[] this->rating;
     }
 
     void setNumeProdus(string nume){
@@ -107,18 +107,12 @@ public:
         return this->nrRatinguri;
     }
 
-    Produs operator++(){
+    const Produs& operator++(){
         this->pret++;
         return *this;
     }
 
-    Produs operator++(int){
-        Produs aux = *this;
-        this->pret++;
-        return aux;
-    }
-
-    Produs operator--(){
+    const Produs& operator--(){
         this->pret--;
         return *this;
     }
@@ -135,7 +129,7 @@ public:
         return aux;
     }
 
-    Produs operator+=(float x){
+    Produs& operator+=(float x){
         this->pret += x;
         return *this;
     }
@@ -181,21 +175,23 @@ public:
             in>>prod.rating[i];
         cout<<"Culoarea produsului este: ";
         in>>prod.culoare;
+        cout<<endl;
         return in;
     }
 
     friend ostream& operator<<(ostream& out, const Produs& prod){
-        out<<"\nNumele produsului este "<<prod.nume;
-        out<<"\nPretul produsului este "<<prod.pret;
+        out<<"Numele produsului este "<<prod.nume<<endl;
+        out<<"Pretul produsului este "<<prod.pret<<endl;
         if(prod.disponibil)
-            out<<"\nProdusul este disponibil";
-        else out<<"\nProdusul nu este disponibil";
-        out<<"\nProdusul are "<<prod.nrRatinguri<<" ratinguri.";
-        if (prod.nrRatinguri)
+            out<<"Produsul este disponibil"<<endl;
+        else out<<"Produsul nu este disponibil"<<endl;
+        out<<"Produsul are "<<prod.nrRatinguri<<" ratinguri"<<endl;
+        if (prod.nrRatinguri){
             out<<"\tAcestea sunt urmatoarele: ";
-        for (int i=0; i<prod.nrRatinguri; i++)
-            out<<prod.rating<<"/10, ";
-        out<<"\nCuloarea produsului este "<<prod.culoare<<endl;
+            for (int i=0; i<prod.nrRatinguri; i++)
+                out<<prod.rating[i]<<"/10 ";
+            out<<endl;}
+        out<<"Culoarea produsului este "<<prod.culoare<<endl<<endl;
         return out;
     }
 
@@ -215,38 +211,294 @@ public:
     }
 };
 
-class Comanda{
-private:
-    string dataComanda;
-    Produs *produse;
-    const int id;
-    static int contorComenzi;
-
-};
 
 class Client{
 private:
     char* nume;
-    Comanda *comenzi;
+    string adresa;
     string mail;
+    float puncteLoialitate;
     int nrComenzi;
+    int* idComenzi;
+
+public:
+    Client(){
+        this->nume = new char[strlen("Anonim"+1)];
+        strcpy(this->nume,"Anonim");
+        this->adresa = "-";
+        this->mail = "-";
+        this->puncteLoialitate = 0;
+        this->nrComenzi = 0;
+        this->idComenzi = NULL;
+    }
+
+    Client(char* nume , string adresa , string mail , float puncteLoialitate , int nrComenzi , int* idComenzi ){
+        this->nume = new char[strlen(nume)+1];
+        strcpy(this->nume, nume);
+        this->adresa = adresa;
+        this->mail = mail;
+        this->puncteLoialitate = puncteLoialitate;
+        this->nrComenzi = nrComenzi;
+        this->idComenzi = new int[this->nrComenzi];
+        for(int i = 0; i < this->nrComenzi; i++)
+            this->idComenzi[i]=idComenzi[i];
+    }
+
+    Client(char* nume){
+        this->nume = new char[strlen(nume)+1];
+        strcpy(this->nume, nume);
+        this->adresa = "-";
+        this->mail = "-";
+        this->puncteLoialitate = 0;
+        this->nrComenzi = 0;
+        this->idComenzi = NULL;
+    }
+
+    Client(char* nume, string mail){
+        this->nume = new char[strlen(nume)+1];
+        strcpy(this->nume, nume);
+        this->adresa = "-";
+        this->mail = mail;
+        this->puncteLoialitate = 0;
+        this->nrComenzi = 0;
+        this->idComenzi = NULL;
+    }
+
+    Client(const Client& client){
+        if(client.nume!=NULL){
+            this->nume = new char[strlen(client.nume)+1];
+            strcpy(this->nume, client.nume);}
+        this->adresa = client.adresa;
+        this->mail = client.mail;
+        this->puncteLoialitate = client.puncteLoialitate;
+        this->nrComenzi = client.nrComenzi;
+        this->idComenzi = new int[nrComenzi];
+        for(int i=0; i<this->nrComenzi; i++)
+            this->idComenzi[i] = client.idComenzi[i];
+    }
+
+    ~Client(){
+        if(this->nume != NULL)
+            delete[] this->nume;
+        if(this->idComenzi != NULL)
+            delete[] this->idComenzi;
+    }
+
+    Client& operator=(const Client& client){
+        if (this != &client){
+            if(this->idComenzi != NULL)
+                delete[] this->idComenzi;
+            if(this->nume != NULL)
+                delete[] this->nume;
+            if(client.nume != NULL)
+                this->nume = new char[strlen(client.nume)+1];
+            strcpy(this->nume,client.nume);
+            this->adresa = client.adresa;
+            this->mail = client.mail;
+            this->puncteLoialitate = client.puncteLoialitate;
+            this->nrComenzi = client.nrComenzi;
+            this->idComenzi = new int[this->nrComenzi];
+            for(int i=0; i<this->nrComenzi; i++)
+                this->idComenzi[i]=client.idComenzi[i];
+        }
+    }
+
+    void setNumeClient(char* nume){
+        this->nume = new char[strlen(nume)+1];
+        strcpy(this->nume, nume);
+    }
+
+    void setAdresaClient(string adresa){
+        this->adresa = adresa;
+    }
+
+    void setMailClient(string mail){
+        this->mail = mail;
+    }
+
+    void setIdComanda(int index, int idComanda){
+        this->idComenzi[index] = idComanda;
+    }
+
+    const char* getNumeClient()const{
+        return this->nume;
+    }
+
+    string getAdresaClient(){
+        return this->adresa;
+    }
+
+    string getMailClient(){
+        return this->mail;
+    }
+
+    int getIdComanda(int index){
+        return this->idComenzi[index];
+    }
+
+    const Client& operator++(){
+        this->puncteLoialitate++;
+        return *this;
+    }
+
+    const Client& operator--(){
+        this->puncteLoialitate--;
+        return *this;
+    }
+
+    Client operator+(int x){
+        Client aux = *this;
+        aux.puncteLoialitate = aux.puncteLoialitate + x;
+        return aux;
+    }
+
+    int operator[](int index){
+        if(index <= this-> nrComenzi)
+            return this->idComenzi[index];
+        else return 0;
+    }
+
+    bool operator==(const Client& client){
+        if (this->nume == client.nume)
+            return true;
+        else return false;
+    }
+
+    Client operator+=(int x){
+        this->puncteLoialitate += x;
+        return *this;
+    }
+
+    Client operator*(int x){
+        Client aux = *this;
+        aux.puncteLoialitate = aux.puncteLoialitate * x;
+        return aux;
+    }
+
+    friend bool operator>(const Client& client1, const Client& client2){
+        return client1.puncteLoialitate > client2.puncteLoialitate;
+    }
+
+    friend istream& operator>>(istream&in, Client& client){
+        cout<<"Numele clientului este: ";
+        char auxnume[25];
+        in>>auxnume;
+        client.nume = new char[strlen(auxnume)+1];
+        strcpy(client.nume, auxnume);
+        cout<<"Adresa clientului este: ";
+        in>>client.adresa;
+        cout<<"Mailul clientului este: ";
+        in>>client.mail;
+        cout<<"Cate puncte de loialitate are clientul: ";
+        in>>client.puncteLoialitate;
+        cout<<"Cate comenzi are clientul: ";
+        in>>client.nrComenzi;
+        for(int i = 0; i<client.nrComenzi; i++)
+            in>>client.idComenzi[i];
+        return in;
+    }
+
+    friend ostream& operator<<(ostream&out, const Client& client){
+        if(client.nume)
+            out<<"Numele clientului este "<<client.nume<<endl;
+        out<<"Adresa clientului este "<<client.adresa<<endl;
+        out<<"Mailul clientului este "<<client.mail<<endl;
+        out<<"Clientul are "<<client.puncteLoialitate<<" puncte de loialitate"<<endl;
+        out<<"Clientul are "<<client.nrComenzi<<" comenzi"<<endl;
+        if (client.nrComenzi){
+            out<<"\n\tAcestea sunt urmatoarele: ";
+            for(int i=0; i<client.nrComenzi; i++)
+                out<<"Comanda cu id "<<client.idComenzi[i]<<endl;
+            cout<<endl;
+            }
+        return out;
+    }
+
+    explicit operator int(){
+        return (int)this->puncteLoialitate;
+    }
+
+    void afisareComenziClient(){
+        if(this->nrComenzi){
+            cout<<this->nume<<" are "<<this->nrComenzi<<" comenzi"<<endl;
+            cout<<"\tAcestea sunt urmatoarele: ";
+            for(int i = 0; i<this->nrComenzi; i++)
+                cout<<this->idComenzi[i];
+
+        }
+    }
 
 };
 
+class Comanda{
+private:
+    Client client;
+    int nrProduse;
+    Produs *produse;
+    const int idComanda;
+    static int contorComenzi;
+
+public:
+    Comanda():idComanda(contorComenzi++){
+        Client client;
+        this->client = client;
+        this->nrProduse = 0;
+        this->produse = NULL;
+    }
+
+};
+int Comanda::contorComenzi=1000;
 
 class Magazin{
 private:
     string nume;
     Produs *produse;
+    int nrProduse;
     string adresa;
     double vanzariTotale;
 };
 
+void meniu(){
+    int alegere, continua =1;
+    cout<<"Meniu"<<endl;
+    cout<<"1.Adauga produs"<<endl;
+    cout<<"2.Adauga comanda"<<endl;
+    cout<<"3.Vezi produse"<<endl;
+    cout<<"4.Vezi comenzi"<<endl;
+
+    cin>>alegere;
+    switch(alegere){
+        case 1:{
+            Produs prod;
+            cin>>prod;
+            // mag = mag + prod;    (/aduagaProd() )
+            break;}
+        case 2:{
+            //Comanda comanda;
+            //cin>>comanda;
+            break;}
+        case 3:{
+            //cout<<magazin.produse
+            break;}
+        case 4:{
+            //cout<<magazin.comenzi
+            break;}
+        case 0:{
+            continua = 0;
+            break;}
+        default:{
+            cout<<"Comanda gresita";
+            break;}
+    }
+}
+
 int main(){
-    Produs prod;
-    cout<<prod;
-    cin>>prod;
-    prod.produsEsteNegru();
+
+    Client p;
+    ++p;
+    p = p*5;
+    cout<<p;
+
 
     return 0;
 }
