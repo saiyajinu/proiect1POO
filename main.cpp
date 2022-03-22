@@ -526,12 +526,12 @@ public:
 
     friend istream& operator>>(istream&in, Comanda& cmd){
         cin>>cmd.client;
-        cout<<"Numarul de produse din comanda este: ";
         int alegere, continua = 1;
         cmd.nrProduse = 0;
         while(continua == 1){
             cout<<"1.Adauga produs\n";
             cout<<"2.Stop\n";
+            cin>>alegere;
             switch (alegere){
                 case 1:{
                     Produs* aux = new Produs[cmd.nrProduse];
@@ -584,26 +584,186 @@ int Comanda::contorComenzi=1000;
 class Magazin{
 private:
     string nume;
-    Produs *produse;
     int nrProduse;
+    Produs *produse;
     string adresa;
     double vanzariTotale;
+
+public:
+    Magazin(){
+        this->nume = "Inexistent";
+        this->nrProduse = 0;
+        this->produse = NULL;
+        this->adresa = "-";
+        this->vanzariTotale = 0;
+    }
+
+    Magazin(string nume, int nrProduse, Produs* produse, string adresa, double vanzariTotale){
+        this->nume = nume;
+        this->nrProduse = nrProduse;
+        for(int i = 0; i< this->nrProduse; i++)
+            this->produse[i] = produse[i];
+        this->adresa = adresa;
+        this->vanzariTotale = vanzariTotale;
+    }
+
+    Magazin(string nume){
+        this->nume = nume;
+        this->nrProduse = 0;
+        this->produse = NULL;
+        this->adresa = "-";
+        this->vanzariTotale = 0;
+    }
+
+    Magazin(string nume, string adresa){
+        this->nume = nume;
+        this->nrProduse = 0;
+        this->produse = NULL;
+        this->adresa = adresa;
+        this->vanzariTotale = 0;
+    }
+
+    Magazin(const Magazin& mag){
+        this->nume = mag.nume;
+        this->nrProduse = mag.nrProduse;
+        for(int i = 0; i < this->nrProduse; i++)  
+            this->produse[i] = mag.adresa[i];
+        this->adresa = mag.adresa;
+        this->vanzariTotale = mag.vanzariTotale;
+    }
+
+    ~Magazin(){
+        if(this->produse != NULL)
+            delelte[] this-> produse;
+    }
+
+    Magazin& operator=(const Magazin& mag){
+        this->nume = mag.nume;
+        this->nrProduse = mag.nrProduse;
+        for(int i = 0; i < this->nrProduse; i++)  
+            this->produse[i] = mag.adresa[i];
+        this->adresa = mag.adresa;
+        this->vanzariTotale = mag.vanzariTotale;
+    }
+
+    void setNumeMagazin(string nume){
+        this->nume = nume;
+    }
+
+    void setAdresaMagazin(string adresa){
+        this->adresa = adresa;
+    }
+
+    void setProduseMagazin(int nrProduse, Produs* produse){
+        this->nrProduse = nrProduse;
+        this->produse = new Produs[this->nrProduse];
+        for(int i = 0; i < this->nrProduse; i++)
+            this->produse[i] = produse[i];
+    }
+
+    string getNumeMagazin(){
+        return this->nume;
+    }
+
+    string getAdresaMagazin(){
+        return this->adresa;
+    }
+
+    Produs* getProduseComanda(){
+        return this->produse;
+    }
+
+    Magazin operator+(Produs& produs){
+        Produs* aux = new Produs[nrProduse];
+        for(int i = 0; i < nrProduse ;i++)
+            aux[i]=this->produse[i];
+        delete[] this->produse;
+        this->nrProduse++;
+        produse = new Produs[nrProduse];
+        for(int i = 0; i < nrProduse-1 ;i++)
+            this->produse[i]=aux[i];
+        produse[nrProduse-1]=produs;
+    }
+
+    Produs operator[](int index){
+        if(index < this-> nrProduse)
+            return this->produse[index];
+    }
+
+    friend istream& operator>>(istream&in, Magazin& mag){
+        cout<<"Numele magazinului este: ";
+        in>>mag.nume;
+        cout<<"Adresa magazinului este: ";
+        in>>mag.adresa;
+        int alegere, continua = 1;
+        mag.nrProduse = 0;
+        while(continua == 1){
+            cout<<"1.Adauga produs\n";
+            cout<<"2.Stop\n";
+            cin>>alegere;
+            switch (alegere){
+                case 1:{
+                    Produs* aux = new Produs[mag.nrProduse];
+                    for(int i = 0; i< mag.nrProduse; i++)
+                        aux[i] = mag.produse[i];
+                    delete[] mag.produse;
+                    mag.nrProduse++;
+                    mag.produse = new Produs[mag.nrProduse];
+                    Produs prod;
+                    cin>>prod;
+                    for(int i = 0; i < mag.nrProduse-1; i++)
+                        mag.produse[i]=aux[i];
+                    mag.produse[mag.nrProduse-1]=prod;
+                    break;
+                }
+                case 2:{
+                    alegere = 0;
+                    break;
+                }
+                default: {
+                    cout<<"Comanda incorecta\n";
+                    break;
+                }
+            }
+        }
+    }
+
+    friend ostream& operator<<(ostream& out, const Magazin& mag){
+        out<<"Magazinul se numeste "<<mag.nume<<endl;
+        out<<"Adresa magazinului este "<<mag.adresa<<endl;
+        out<<"Magazinul are "<<mag.nrProduse<<" produse";
+        out<<"Acestea sunt: ";
+        for(int i = 0; i < mag.nrProduse; i++)
+            out<<mag.produse[i];
+        out<<endl;
+        out<<"Magazinul are "<<mag.vanzariTotale<<" vanzari totale";
+    }
+
+    void afisProdseDisponibileDinMagazin(){
+        for(int i = 0; i < this->nrProduse; i++)
+            if(this->produse[i].getDisponibilProdus)
+                cout<<produse[i];
+    }
 };
+
+int numarProduse;
+Produs 
 
 void meniu(){
     int alegere, continua = 1;
-    cout<<"Meniu"<<endl;
-    cout<<"1.Adauga produs"<<endl;
-    cout<<"2.Adauga comanda"<<endl;
-    cout<<"3.Vezi produse"<<endl;
-    cout<<"4.Vezi comenzi"<<endl;
+    cout<<"Menu"<<endl;
+    cout<<"1.Create"<<endl;
+    cout<<"2.Read"<<endl;
+    cout<<"3.Update"<<endl;
+    cout<<"4.Delete"<<endl;
+    cout<<"0.Stop"<<endl;
 
     cin>>alegere;
     switch(alegere){
         case 1:{
             Produs prod;
             cin>>prod;
-            // mag = mag + prod;    (/aduagaProd() )
+            // mag = mag + prod;    (/aduagaProd() )...
             break;}
         case 2:{
             //Comanda comanda;
