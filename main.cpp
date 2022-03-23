@@ -3,6 +3,10 @@
 
 using namespace std;
 
+int numarProduse;
+int numarClienti;
+int numarComenzi;
+
 class Produs{
 private:
     string nume;
@@ -96,7 +100,10 @@ public:
     }
 
     bool getDisponibilProdus(){
-        return this->disponibil;
+        bool aux;
+        if(this->disponibil == 1)
+            aux = 1;
+        return aux;
     }
 
     const int* getRatingProdus()const{
@@ -165,7 +172,7 @@ public:
         in>>prod.nume;
         cout<<"Pretul produsului este: ";
         in>>prod.pret;
-        cout<<"Produsul este disponibil: ";
+        cout<<"Produsul este disponibil(0/1): ";
         in>>prod.disponibil;
         cout<<"Numarul de ratinguri ale produsului este: ";
         in>>prod.nrRatinguri;
@@ -187,7 +194,7 @@ public:
         else out<<"Produsul nu este disponibil"<<endl;
         out<<"Produsul are "<<prod.nrRatinguri<<" ratinguri"<<endl;
         if (prod.nrRatinguri){
-            out<<"\tAcestea sunt urmatoarele: ";
+            out<<"Acestea sunt urmatoarele: ";
             for (int i=0; i<prod.nrRatinguri; i++)
                 out<<prod.rating[i]<<"/10 ";
             out<<endl;}
@@ -223,7 +230,7 @@ private:
 
 public:
     Client(){
-        this->nume = new char[strlen("Anonim"+1)];
+        this->nume = new char[strlen("Anonim")+1];
         strcpy(this->nume,"Anonim");
         this->adresa = "-";
         this->mail = "-";
@@ -382,6 +389,7 @@ public:
         cout<<"Numele clientului este: ";
         char auxnume[25];
         in>>auxnume;
+        delete[] client.nume;
         client.nume = new char[strlen(auxnume)+1];
         strcpy(client.nume, auxnume);
         cout<<"Adresa clientului este: ";
@@ -390,10 +398,7 @@ public:
         in>>client.mail;
         cout<<"Cate puncte de loialitate are clientul: ";
         in>>client.puncteLoialitate;
-        cout<<"Cate comenzi are clientul: ";
-        in>>client.nrComenzi;
-        for(int i = 0; i<client.nrComenzi; i++)
-            in>>client.idComenzi[i];
+        cout<<endl;
         return in;
     }
 
@@ -405,11 +410,11 @@ public:
         out<<"Clientul are "<<client.puncteLoialitate<<" puncte de loialitate"<<endl;
         out<<"Clientul are "<<client.nrComenzi<<" comenzi"<<endl;
         if (client.nrComenzi){
-            out<<"\n\tAcestea sunt urmatoarele: ";
+            out<<"\nAcestea sunt urmatoarele: ";
             for(int i=0; i<client.nrComenzi; i++)
                 out<<"Comanda cu id "<<client.idComenzi[i]<<endl;
-            cout<<endl;
             }
+        cout<<endl;
         return out;
     }
 
@@ -420,7 +425,7 @@ public:
     void afisareComenziClient(){
         if(this->nrComenzi){
             cout<<this->nume<<" are "<<this->nrComenzi<<" comenzi"<<endl;
-            cout<<"\tAcestea sunt urmatoarele: ";
+            cout<<"Acestea sunt urmatoarele: ";
             for(int i = 0; i<this->nrComenzi; i++)
                 cout<<this->idComenzi[i];
 
@@ -455,6 +460,7 @@ public:
 
     Comanda(Client client):idComanda(contorComenzi++){
         this->client = client;
+        this->nrProduse = 0;
     }
 
     Comanda(const Comanda& cmd):idComanda(cmd.idComanda){
@@ -526,48 +532,19 @@ public:
 
     friend istream& operator>>(istream&in, Comanda& cmd){
         cin>>cmd.client;
-        int alegere, continua = 1;
-        cmd.nrProduse = 0;
-        while(continua == 1){
-            cout<<"1.Adauga produs\n";
-            cout<<"2.Stop\n";
-            cin>>alegere;
-            switch (alegere){
-                case 1:{
-                    Produs* aux = new Produs[cmd.nrProduse];
-                    for(int i = 0; i< cmd.nrProduse; i++)
-                        aux[i] = cmd.produse[i];
-                    delete[] cmd.produse;
-                    cmd.nrProduse++;
-                    cmd.produse = new Produs[cmd.nrProduse];
-                    Produs prod;
-                    cin>>prod;
-                    for(int i = 0; i < cmd.nrProduse-1; i++)
-                        cmd.produse[i]=aux[i];
-                    cmd.produse[cmd.nrProduse-1]=prod;
-                    break;
-                }
-                case 2:{
-                    alegere = 0;
-                    break;
-                }
-                default: {
-                    cout<<"Comanda incorecta\n";
-                    break;
-                }
-            }
-        }
         return in;
     }
 
     friend ostream& operator<<(ostream& out, const Comanda& cmd){
         out<<"Comanda este data de"<<endl<<cmd.client<<endl;
-        out<<"Comanda are "<<cmd.nrProduse<<" produse";
-        out<<"Acestea sunt: ";
-        for(int i = 0; i< cmd.nrProduse; i++)
+        out<<"Comanda are "<<cmd.nrProduse<<" produse"<<endl;
+        out<<"Acestea sunt: "<<endl;
+        for(int i = 0; i< cmd.nrProduse; i++){
             out<<cmd.produse[i];
+            cout<<endl;
+        }
         out<<endl;
-        out<<"Comanda are id-ul "<<cmd.idComanda<<endl;
+        out<<"Comanda are id-ul "<<cmd.idComanda<<endl<<endl;
     }
 
     void afisareProduseComanda(){
@@ -586,16 +563,20 @@ private:
     string nume;
     int nrProduse;
     Produs *produse;
+    Client *clienti;
+    Comanda *comenzi;
     string adresa;
     double vanzariTotale;
 
 public:
     Magazin(){
-        this->nume = "Inexistent";
-        this->nrProduse = 0;
-        this->produse = NULL;
-        this->adresa = "-";
-        this->vanzariTotale = 0;
+        this->nume = "PeriPC";
+        this->nrProduse = 100;
+        this->produse = new Produs[this->nrProduse];
+        this->clienti = new Client[100];
+        this->comenzi = new Comanda[100];
+        this->adresa = "str. Perifericelor";
+        this->vanzariTotale = 69420.3;
     }
 
     Magazin(string nume, int nrProduse, Produs* produse, string adresa, double vanzariTotale){
@@ -626,22 +607,22 @@ public:
     Magazin(const Magazin& mag){
         this->nume = mag.nume;
         this->nrProduse = mag.nrProduse;
-        for(int i = 0; i < this->nrProduse; i++)  
-            this->produse[i] = mag.adresa[i];
+        for(int i = 0; i < this->nrProduse; i++)
+            this->produse[i] = mag.produse[i];
         this->adresa = mag.adresa;
         this->vanzariTotale = mag.vanzariTotale;
     }
 
     ~Magazin(){
         if(this->produse != NULL)
-            delelte[] this-> produse;
+            delete[] this-> produse;
     }
 
     Magazin& operator=(const Magazin& mag){
         this->nume = mag.nume;
         this->nrProduse = mag.nrProduse;
-        for(int i = 0; i < this->nrProduse; i++)  
-            this->produse[i] = mag.adresa[i];
+        for(int i = 0; i < this->nrProduse; i++)
+            this->produse[i] = mag.produse[i];
         this->adresa = mag.adresa;
         this->vanzariTotale = mag.vanzariTotale;
     }
@@ -698,9 +679,10 @@ public:
         int alegere, continua = 1;
         mag.nrProduse = 0;
         while(continua == 1){
-            cout<<"1.Adauga produs\n";
-            cout<<"2.Stop\n";
+            cout<<"1.Add product\n";
+            cout<<"2.Stop\n"<<endl;
             cin>>alegere;
+            cout<<endl;
             switch (alegere){
                 case 1:{
                     Produs* aux = new Produs[mag.nrProduse];
@@ -717,11 +699,11 @@ public:
                     break;
                 }
                 case 2:{
-                    alegere = 0;
+                    continua = 0;
                     break;
                 }
                 default: {
-                    cout<<"Comanda incorecta\n";
+                    cout<<"Comanda incorecta\n"<<endl;
                     break;
                 }
             }
@@ -731,66 +713,144 @@ public:
     friend ostream& operator<<(ostream& out, const Magazin& mag){
         out<<"Magazinul se numeste "<<mag.nume<<endl;
         out<<"Adresa magazinului este "<<mag.adresa<<endl;
-        out<<"Magazinul are "<<mag.nrProduse<<" produse";
-        out<<"Acestea sunt: ";
-        for(int i = 0; i < mag.nrProduse; i++)
-            out<<mag.produse[i];
-        out<<endl;
-        out<<"Magazinul are "<<mag.vanzariTotale<<" vanzari totale";
+        out<<"Magazinul are "<<mag.vanzariTotale<<" vanzari totale"<<endl<<endl;
     }
 
     void afisProdseDisponibileDinMagazin(){
         for(int i = 0; i < this->nrProduse; i++)
-            if(this->produse[i].getDisponibilProdus)
+            if(this->produse[i].getDisponibilProdus())
                 cout<<produse[i];
+    }
+
+    void meniu(){
+    int alegere, continua = 1;
+    while(continua){
+        cout<<"Menu"<<endl;
+        cout<<"1.Create"<<endl;
+        cout<<"2.Read"<<endl;
+        //cout<<"3.Update"<<endl;
+        //cout<<"4.Delete"<<endl;
+        cout<<"0.Stop"<<endl;
+        cout<<endl;
+        cin>>alegere;
+        cout<<endl;
+        switch(alegere){
+            case 1:{
+                int alegereDoi;
+                cout<<"1.Create product"<<endl;
+                cout<<"2.Create order"<<endl;
+                cout<<"3.Create customer"<<endl;
+                cout<<"0.Cancel"<<endl;
+                cout<<endl;
+                cin>>alegereDoi;
+                cout<<endl;
+
+                switch(alegereDoi){
+                    case 1:{
+                        cin>>this->produse[numarProduse++];
+                        break;
+                    }
+                    case 2:{
+                        cout<<"Add customer number ";
+                        int custnrr, nrProd, idProd;
+                        cin>>custnrr;
+                        cout<<endl;
+                      //  Comanda c(this->clienti[custnrr]);
+                        //cout<<c;
+                        cout<<"Add number of products ";
+                        cin>>nrProd;
+                        cout<<endl;
+                        Produs produse[nrProd];
+                        for(int i = 0; i < nrProd; i++){
+                            cout<<"Enter product ID ";
+                            cin>>idProd;
+                            cout<<endl;
+                            produse[i] = this->produse[idProd];
+                        }
+                        Comanda c(this->clienti[custnrr], nrProd, produse);
+                        comenzi[numarComenzi++] = c;
+                        //cin>>this->comenzi[numarComenzi++];
+                        break;
+                    }
+                    case 3:{
+                        cin>>this->clienti[numarClienti++];
+                        break;
+                    }
+                    case 0:{
+                        cout<<"Creation cancelled"<<endl<<endl;
+                        break;
+                    }
+                    default:{
+                        cout<<"Wrong command"<<endl<<endl;
+                        break;
+                    }
+                }
+                break;}
+            case 2:{
+                int alegereTrei;
+                cout<<"1.Read product"<<endl;
+                cout<<"2.Read order"<<endl;
+                cout<<"3.Read customer"<<endl;
+                cout<<"0.Cancel"<<endl;
+                cout<<endl;
+                cin>>alegereTrei;
+                cout<<endl;
+                switch(alegereTrei){
+                    case 1:{
+                        int prodnr;
+                        cout<<"Product number? ";
+                        cin>>prodnr;
+                        cout<<endl;
+                        cout<<this->produse[prodnr];
+                        break;
+                    }
+                    case 2:{
+                        int ordnr;
+                        cout<<"Order number? ";
+                        cin>>ordnr;
+                        cout<<endl;
+                        cout<<this->comenzi[ordnr];
+                        break;
+                    }
+                    case 3:{
+                        int custnr;
+                        cout<<"Customer number? ";
+                        cin>>custnr;
+                        cout<<endl;
+                        cout<<this->clienti[custnr];
+                        break;
+                    }
+                    case 0:{
+                        cout<<"Read cancelled"<<endl<<endl;
+                        break;
+                    }
+                    default:{
+                        cout<<"Wrong command"<<endl<<endl;
+                        break;
+                    }
+                }
+                break;}
+            case 3:{
+                cout<<"Updating is not yet allowed"<<endl<<endl;
+                break;}
+            case 4:{
+                cout<<"Deleting is not yet allowed"<<endl<<endl;
+                break;}
+            case 0:{
+                continua = 0;
+                break;}
+            default:{
+                cout<<"Wrong command"<<endl;
+                break;}
+            }
+        }
     }
 };
 
-int numarProduse;
-Produs 
-
-void meniu(){
-    int alegere, continua = 1;
-    cout<<"Menu"<<endl;
-    cout<<"1.Create"<<endl;
-    cout<<"2.Read"<<endl;
-    cout<<"3.Update"<<endl;
-    cout<<"4.Delete"<<endl;
-    cout<<"0.Stop"<<endl;
-
-    cin>>alegere;
-    switch(alegere){
-        case 1:{
-            Produs prod;
-            cin>>prod;
-            // mag = mag + prod;    (/aduagaProd() )...
-            break;}
-        case 2:{
-            //Comanda comanda;
-            //cin>>comanda;
-            break;}
-        case 3:{
-            //cout<<magazin.produse
-            break;}
-        case 4:{
-            //cout<<magazin.comenzi
-            break;}
-        case 0:{
-            continua = 0;
-            break;}
-        default:{
-            cout<<"Comanda gresita";
-            break;}
-    }
-}
-
 int main(){
-
-    Client p;
-    ++p;
-    p = p*5;
-    cout<<p;
-
+    Magazin mag;
+    cout<<mag;
+    mag.meniu();
 
     return 0;
 }
