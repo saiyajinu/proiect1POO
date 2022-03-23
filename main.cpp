@@ -536,14 +536,14 @@ public:
     }
 
     friend ostream& operator<<(ostream& out, const Comanda& cmd){
-        out<<"Comanda este data de"<<endl<<cmd.client<<endl;
+        out<<"Comanda este data de:"<<endl<<cmd.client;
         out<<"Comanda are "<<cmd.nrProduse<<" produse"<<endl;
         out<<"Acestea sunt: "<<endl;
         for(int i = 0; i< cmd.nrProduse; i++){
             out<<cmd.produse[i];
-            cout<<endl;
+           // cout<<endl;
         }
-        out<<endl;
+        //out<<endl;
         out<<"Comanda are id-ul "<<cmd.idComanda<<endl<<endl;
     }
 
@@ -838,6 +838,7 @@ public:
                 break;}
             case 0:{
                 continua = 0;
+                cout<<"Menu has been closed"<<endl;
                 break;}
             default:{
                 cout<<"Wrong command"<<endl;
