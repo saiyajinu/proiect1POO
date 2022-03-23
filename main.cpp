@@ -713,7 +713,7 @@ public:
     friend ostream& operator<<(ostream& out, const Magazin& mag){
         out<<"Magazinul se numeste "<<mag.nume<<endl;
         out<<"Adresa magazinului este "<<mag.adresa<<endl;
-        out<<"Magazinul are "<<mag.vanzariTotale<<" vanzari totale"<<endl<<endl;
+        out<<"Magazinul are vanzari totale in valoare de "<<mag.vanzariTotale<<" lei"<<endl<<endl;
     }
 
     void afisProdseDisponibileDinMagazin(){
